@@ -119,21 +119,6 @@ mpg %>%
   summarise(mean_hwy=mean(hwy,na.rm = T))
 
 table(is.na(df$score))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ggplot(data=mpg,aes(x=displ,y=hwy))
 ggplot(data=mpg,aes(x=displ,y=hwy))+
   geom_point()+

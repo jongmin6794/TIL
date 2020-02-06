@@ -223,6 +223,7 @@ summary(wbcd[c("radius_mean","area_mean","smoothness_mean")])
 normalize<-function(x){#정규화 함수 작성
   return ( (x-min(x))/(max(x)-min(x)) )
 }
+wbcd[2:31]
 wbcd$diagnosis
 normalize(c(1,2,3,4,5))
 wbcd_n<-as.data.frame(lapply(wbcd[2:31],normalize))#정규화 
@@ -288,5 +289,91 @@ CrossTable(x=wbcd_z_test_labels,
            y=wbcd_z_test_pred,
            prop.chisq = TRUE)#
 
-#문제2
-iris
+#문제2 error
+ttt<-iris[-5]
+ttt
+normalize<-function(x){
+  return( (x-min(x))/(max(x)-min(x)) )
+}
+nomalize(c)
+
+iris_z<-as.data.frame(scale(iris[-5]))
+iris_Z_train1<-iris_z[1:35,]
+iris_Z_train2<-iris_z[51:85,]
+iris_Z_train3<-iris_z[101:135,]
+iris_Z_train<-rbind(iris_Z_train1,iris_Z_train2,iris_Z_train3)
+iris_Z_train#인덱스는 다시 1부터 초기화 아니고 그대로 오네... 흠
+iris_Z_test1<-iris_z[36:50,]
+iris_Z_test2<-iris_z[86:100,]
+iris_Z_test3<-iris_z[136:150,]
+iris_z_test<-rbind(iris_Z_test1,iris_Z_test2,iris_Z_test3)
+iris_z_test
+iris_z_train_labels1<-iris[1:35,5]#데이터 타입이 df에서 factor로
+iris_z_train_labels2<-iris[51:85,5]#들어가므로 df로 변경해줘야함
+iris_z_train_labels3<-iris[101:135,5]#결국 현재로서는error코드
+iris_z_train_labels<-rbind(iris_z_train_labels1,iris_z_train_labels2,iris_z_train_labels3)
+iris_z_test_labels1<-iris[36:50,5]
+iris_z_test_labels2<-iris[86:100,5]
+iris_z_test_labels3<-iris[136:150,5]
+iris_z_test_labels<-rbind(iris_z_test_labels1,iris_z_test_labels2,iris_z_test_labels3)
+library(class)
+iris_z_test_pred<-knn(train = iris_Z_train,
+                      test = iris_z_test,
+                      cl = iris_z_train_labels,
+                      k=5)
+library(gmodels)
+CrossTable(x=iris_z_test_labels,
+           y=iris_z_test_pred,
+           prop.chisq = FALSE)
+#iris_z_train_labels<-(labels=c("setosa","versicolor","virginica"))
+iris_z_test_labels
+iris_z_train_labels1
+iris_z_train_labels2
+testdd<-rbind(iris_z_train_labels1,iris_z_train_labels2)
+
+iris_z_train_labels
+iris_Z_train
+iris_Z_train1
+iris_Z_train2
+iris_Z_train3
+iris[1:35,5]
+tl<-iris[5]
+tl
+#문제2 다시
+iris[1:3]
+nomalize<-function(x){#정규화 함수 작성
+  return ( (x-min(x))/(max(x)-min(x)) )
+}
+iris_n<-as.data.frame(lapply(iris[-5], nomalize))
+iris_n
+iris_Z<-as.data.frame(scale(iris[-5]))#표준화
+iris_Z
+iris_n_train<-iris_n[c(1:35,51:85,101:135),]
+iris_z_train<-iris_z[c(1:35,51:85,101:135),]
+iris_n_test<-iris_n[c(36:50,86:100,136:150),]
+iris_z_test<-iris_z[c(36:50,86:100,136:150),]
+#iris_n_train_labels<-iris[c(1:35,51:85,101:135),5]
+#위 데이터 타입 factor라 안됨... as.data.fram도 인텍스 컬럼 명
+#바뀌어서 쉽지 않다...따라서 아래와 같이 두번 작업 필요
+iris_labels<-iris[5]
+iris_n_train_labels<-iris_labels[c(1:35,51:85,101:135),]
+iris_z_train_labels<-iris_labels[c(1:35,51:85,101:135),]
+iris_n_test_labels<-iris_labels[c(36:50,86:100,136:150),]
+iris_z_test_labels<-iris_labels[c(36:50,86:100,136:150),]
+library(class)
+iris_n_test_pred<-knn(train = iris_n_train,
+                      test = iris_n_test,
+                      cl = iris_n_train_labels,
+                      k=11)
+library(gmodels)
+CrossTable(x=iris_n_test_labels,
+           y=iris_n_test_pred,
+           prop.chisq = FALSE)
+iris_z_test_pred<-knn(train = iris_z_train,
+                      test = iris_z_test,
+                      cl = iris_z_train_labels,
+                      k=13)
+CrossTable(x=iris_z_test_labels,
+           y=iris_z_test_pred,
+           prop.chisq = FALSE)
+
