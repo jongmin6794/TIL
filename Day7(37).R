@@ -119,8 +119,9 @@ sms_dtm2<-DocumentTermMatrix(sms_corpus,
                                             removeNumbers=TRUE,
                                             stopwords=TRUE,
                                             removePunctuation=TRUE,
-                                            stemming=TRUE
+                                            stemming=TRUE #형태소 분석
                                             ))# sparse 희소행렬
+
 sms_dtm_train<-sms_dtm2[1:4169,]
 sms_dtm_test<-sms_dtm2[4170:5559,]
 sms_train_labels<-sms_raw[1:4169,]$type
