@@ -8,7 +8,7 @@ summary(mypaper)
 mypaper[[2]] #두번째 문서
 mypaper[[2]]$content
 mypaper[[2]]$meta
-
+#meta:mypaper[[2]]를 설명하는 데이터
 meta(mypaper[[2]], tag ='author')<-'g.d.hong'
 mypaper[[2]]
 mypaper[[2]]$meta
@@ -17,29 +17,30 @@ mypaper[[2]]$meta
 library(stringr)
 myfunc<-function(x){
   #특수기호(-, /,...) 전후의 단어를 확인
-  str_extract_all(x,"[[:alnum:]]{1,}[[:punct:]]{1}[[:alnum:]]{1,}")
+  mypuncts<-
+    str_extract_all(x,"[[:alnum:]]{1,}[[:punct:]]{1}[[:alnum:]]{1,}")
 }
 mypuncts<-lapply(mypaper,myfunc)
 table(unlist(mypuncts))
 
 myfunc<-function(x){
   #수치 자료 추출
-  str_extract_all(x,"[[:digit:]]{1,}")
+  mydigits<-str_extract_all(x,"[[:digit:]]{1,}")
 }
 mydigits<-lapply(mypaper,myfunc)
 table(unlist(mydigits))
 
 #고유명사 추출(대문자로 시작)
-
 myfunc<-function(x){
   #수치 자료 추출
-  str_extract_all(x,"[[:upper:]]{1}[[:alpha:]]{1,}")
+  myuppers<-str_extract_all(x,"[[:upper:]]{1}[[:alpha:]]{1,}")
 }
 myuppers<-lapply(mypaper,myfunc)
 table(unlist(myuppers))
 
 mypaper[[2]]$content
-
+#추가
+mycorpus<-tm_map(mypaper,removeNumbers)
 mytempfunc<-function(myobject,oldexp,newexp){
   newobject<-tm_map(myobject, 
                     content_transformer(
@@ -87,10 +88,11 @@ mytotalword1<-sum(table(unlist(myword))) #총 3504 개 단어 사용
 results.comparing<-rbind(
   c(myuniquechar0, myuniquechar1),
   #전처리 전 글자 종류:79, 전처리 후 : 41
-  c(mytotalchar0, mytotalchar1), #조금 후 수정
+  c(mytotalchar0, mytotalchar1),
   c(myuniqueword0, myuniqueword1),
   #1151, 710
   c(mytotalword0, mytotalword1))
+
 #3504, 2060
 results.comparing
 colnames(results.comparing)<-c("before","after")
@@ -109,7 +111,8 @@ colnames(dtm.e[,])
 #행렬의 내용 참조
 inspect(dtm.e[1:3,50:55])
 
-# TF-IDf(토픽모델링)
+# TF-IDf(토픽모델링) 만들어지기 전에 dtm만들어져야함
+# 행은 문서 이름, 열 단어, 내용은 단어 수가 채워져있어야함.
 # Bag of Words(BoW)
 # -단어 출현 빈도 
 # -DTM 구성 TF기반으로 구성
@@ -128,16 +131,57 @@ inspect(dtm.e[1:3,50:55])
 #         특정 문서에서 자주 등장하는 단어는 중요도가 높다.
 # TFIDF가 크면 단어의 중요도가 크다
 dtm.e.tfidf<-DocumentTermMatrix(mycorpus,control = 
-                     list(weightning=
-                            function(x) weightTf(x,normalize=FALSE)))
+                     list(weighting= 
+                            function(x) weightTfIdf(x,normalize=FALSE)))
 dtm.e.tfidf
-
+inspect(dtm.e.tfidf[1:3,50:55])
 # TF는 크지만, TFIDF는 작은 단어들 검출
 # 영향력 작은 흔한 단어들
-as.matrix(dtm.e[,])
-as.matrix(dtm.e.tfidf[,])
-
+value.tf.dtm<-as.vector(as.matrix(dtm.e[,]))
+value.tf.dtm
+value.tfidf.dtm<-as.vector(as.matrix(dtm.e.tfidf[,]))
+value.tfidf.dtm
 # tfidf 매트릭스
+dim(dtm.e[,])[1]#24 24개 문서, 703개 단어
+dim(dtm.e[,])[2]#703
+colnames(dtm.e[,])#703개 단어 확인
+#rep("test",each=3)
+rep(1:3,each=10)#11111...222222...3333...
+rep(1:3,times=10)#123123123...#times가 디폴트
+word.label.dtm<-rep(colnames(dtm.e[,]),each=dim(dtm.e[,])[1])
+doc.label.dtm<-rep(rownames(dtm.e[,]),dim(dtm.e[,])[2])
+word.label.dtm
+doc.label.dtm
+mydata<-data.frame(word.label.dtm, doc.label.dtm,
+           value.tf.dtm, value.tfidf.dtm)
+mydata
+colnames(mydata)<-c("word","doc","tf","tfidf")
+mydata[120:130,]
+#산점도
+#상관관계(켄달)
+cor.test(mydata$tf,mydata$tfidf,method="kendall")
+#0.98 굉장이 높은 양의 상관관계 나옴
+mydata$tf[mydata$tf>0]
+mydata$tfidf[mydata$tfidf>0]
+cor.test(mydata$tf[mydata$tf>0], #0.46높지않다. 
+         mydata$tfidf[mydata$tfidf>0],method="kendall")
+#즉, TF값의 순위가 높아도 TFIDF값의 순위가 
+#높지 않은 경우가 적지 않다.
+
+#어떤 단어가 TF가 높고 TFIDF가 낮은지?
+#1)TF, TFIDF가 모두 0보다 큰 데이터 추출
+#2)추출된 것들 중 TF>중위수, TFIDF<중위수 추출 =>단어확인
+#class(mydata)->sub dataframe  subset사용
+#subset(mydata,조건)#1
+mydata2<-subset(mydata,tf>0 & tfidf>0)
+#
+table(mydata2$word)
+mydata3<-subset(mydata2,tf>median(mydata2$tf) & 
+                  tfidf<median(mydata2$tfidf))
+str(mydata3)
+table(mydata3$word)[table(mydata3$word)>0]#??
+
+
 ############################
 install.packages("Sejong")
 install.packages("hash")
@@ -187,7 +231,7 @@ pre_str<-model_results$net.result
 pre_str
 cor(pre_str,concrete_test$strength)
 
-#히든 레이어 여러개 주지
+#히든 레이어 여러개 주기
 concrete_model2<-neuralnet(formula = strength~cement+slag+
                             ash+water+superplastic+
                              coarseagg+fineagg+age,
