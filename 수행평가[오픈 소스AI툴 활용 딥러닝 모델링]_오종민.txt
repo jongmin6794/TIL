@@ -1,0 +1,239 @@
+문제
+[TensorFlow와 Keras 라이브러리를 활용한 딥러닝]
+1. 케라스로 신경망 설계시 Seqential 및 Dense 클래스 용법에 대해 설명하시오.
+2. 다음 코드를 설명하시오.
+코드:
+sess.run(train_step,feed_dict={x:batch_xs,t:batch_ts,keep_prob:0.5})
+
+[강화학습 기법을 활용한 인공지능 고급구현]
+1. 모델 피팅(fitting)에 대해 정의하고, 피팅 종류를 나열하시오.
+2. 정규화 및 표준화에대해 설명하시오.
+
+[CNN과 GAN을 활용한 이미지데이터 모델링]
+1. 다음 코드는 A,B 두 문서가 주어졌을 때, 두 문서간 코사인 유사도를 구하는 함수의 일부이다. 밑줄친 부분에 들어가야 할 코드를 작성하시오.
+from numpy import dot
+from numpy.linalg import norm
+import numpy as np
+def cosSim(A,B):
+return ________________________________________
+2. CNN알고리즘에서 stride를 계산하는 수식을 기술하시오.
+3. pooling 레이어의 동작에 대해 설명하시오.
+
+[RNN을 활용한 챗봇 시스템 구축]
+텍스트 전처리는
+토큰화 ->정제 및 정규화 ->어간 추출 -> 불용어 제거 -> 정규표현식 ->인코딩 -> 단어 분리 과정을 거치게 된다. 각 과정에 대한 간단한 설명 및 예시 코드를 작성하시오. (R / Python 중 선택)
+평가기준
+- TensorFlow와 Keras 라이브러리를 활용한 딥러닝
+- 모델링 종류 및 차이점 이해
+- 세션 실행시 옵션 이해
+- 세션 생성 및 실행 코드 이해
+- 코딩 능력
+- 데이터 전처리 능력
+- 오버피팅 문제 정의 및 해결 능력
+- 정규화와 표준화의 차이점 구분 능력
+- 피팅 방법 이해
+- CNN과 GAN을 활용한 이미지데이터 모델링
+- 이미지 전처리 능력
+- 풀링 계층에 대한 이해
+- CNN 동작 원리 이해
+- RNN을 활용한 챗봇 시스템 구축
+- 챗봇 동작 원리 이해
+- 한국어 처리 능력
+- 전처리 능력
+
+답
+[TensorFlow와 Keras 라이브러리를 활용한 딥러닝]
+1.1 케라스 Sequential
+-직관적으로 레이어를 층층이 쌓아가는 것 
+-시퀀셜 모델은 레이어를 선형으로 연결하여 구성합니다. 
+레이어 인스턴스를 생성자에게 넘겨줌으로써 시퀀셜 모델을 구성할 수 있습니다.
+만들어진 모델은 입력 형태에 대한 정보를 필요로 합니다. 때문에 시퀀설 모델의
+첫 번째 레이어는 입력 형태에 대한 정보를 받습니다. 두 번째 이후 레이어들은 자동
+으로 현태를 추정할 수 있기 때문에 형태 정보를 갖고 있을 필요는 없습니다. 
+형태 정보를 전달하기 위한 방법은 다음과 같습니다.
+정수형 또는 None으로 구성된 형태 튜플(shape tuple)의 input_shape인자를 첫번째
+레이어에 전달합니다. 여기서 None은 음이 아닌 어떠한 정수를 받을 수 있음을
+의미합니다. 참고로 input_shape에는 배치 차원은 포함되지 않습니다.
+
+1.2 Dense 클래스 용법 
+-dense는 입력과 출력을 모두 연결해주는 NN레이어이다. 케라스에서는 dense가 
+클래스로 구현되어 있다. dense로 만든 node는 각각 w, b를 가집니다.
+
+-케라스에서는 전결합층을 dense 클래스로 구현됩니다. dense레이어는 입력 뉴런 수에
+상관없이 출력 뉴런 수를 자유롭게 설정할 수 있기 때문에 출력층으로 많이 사용됩니다.
+
+-입출력을 모두 연결해주는 dense레이어로 코드 형태는 아래와 같이 나타낼 수있습니다.
+ex) Dense(8, input_dim=4, init='uniform', activation='relu')
+첫번째 인자는 출력 뉴런싀 수, input_dim은 입력 뉴런의 수를 의미합니다. 따라서
+학습해야 되는 가중치는 32개입니다.
+또한, init은 가중치 초기화 방법 설정으로 uniform은 균일 분포를 의미합니다.
+그리고 activation은 활성함수 설정으로 여기서는 relu함수를 사용하겠다는 의미입니다.
+
+2. sess.run(train_step,feed_dict={x:batch_xs,t:batch_ts,keep_prob:0.5})
+train_step을 뒤의 요소들을 활용하여 실행합니다. feed_dict를 통해 x인자에 batch_xs를 넣어주고, t에는 batch_ts를 넣어줍니다. keep_prob
+는 dropout의 정도를 결정하는 인자가 1일시에 노드를 다 사용하고 0.5일시 50프로의
+노드만 연결하여 사용해 오버피팅을 방지하는 기능을 수행합니다.
+
+
+[강화학습 기법을 활용한 인공지능 고급구현]
+1. 모델 피팅
+개발한 모델에 대해 train 데이터와 test데이터를 적용해 보는 것으로
+결과에 따라 오버피팅과 언더피팅이 나올 수 있다.
+오버피팅이란 train데이터에 대해서만 너무 과도하게 학습을 시키거나, train데이터에 
+대해서만 너무 과하게 자세히 모델링을 하여 train데이터에 대해서는 정확도가 높으나 
+test데이터에서는 정확도가 낮은 상태를 일컷는다.
+언더피팅이란 모델이 너무 단순하여 제대로 역할을 못하는 상태를 말한다.
+
+2. 정규화와 표준화 모두 일치하지 않는 단위나, 수치적으로 너무 큰 차이로 인해
+특정 컬럼의 영향력이 너무 높아지는 것을 방지하기 위해 데이터 전반적으로 
+범위를 일치시키거나 분포를 유사하게 만들어 주는 작업입니다.
+각각 방식에 따라 여러 종류가 있지만 대표적으로
+정규화는 (요소값-최소값)/(최대값-최소값)으로 수식을 나타내고 데이터 군 내에서
+특정 데이터가 가지는 위치를 볼 때 주로 사용합니다.
+표준화는 (요소값-평균)/표준편차로 수식을 나타낼 수 있으며, 평균을 기준으로
+얼마나 떨어져 있는지를 나타냅니다. 또한 데이터를 다소 평평하게 하는 즉, 데이터의 
+진폭을 줄이는 특성을 가집니다.
+
+
+[CNN과 GAN을 활용한 이미지데이터 모델링]
+1.  dot(A,B)/(norm(A)*norm(B))
+
+2. CNN알고리즘에서 stride를 계산하는 수식을 기술하시오.
+output Size = (W + 2P -F)/S + 1
+W:input_volume_size
+F:kernel_size
+P:padding_size
+S:strides
+ex) 입력:(4,4), 패딩:1, 스트라이드:1, 필터(3,3)
+출력은? 높이 H={ (4 + 2*1 - 3) / 1 } + 1 =4
+너비 W={ (4 + 2*1 - 3) / 1} + 1=4 로 구할 수 있다.
+
+3.pooling 레이어의 동작에 대해 설명하시오.
+pooling이란 convolution을 거쳐서 나온 activation maps이 있을 때, 이를 이루는
+convolution layer을 resizing하여 새로운 layer를 얻는 것입니다.
+대표적으로 max pooling을 예를들어 설명하자면 
+stride가 2일때 2*2 필터를 통하여 max pooling을 하면 각 4개의 숫자(영역)에서 
+가장 큰 수를 찾고, 이를 stride 넘어가며 4*4 ->2*2 사이즈로 변형해 줍니다.
+이를 행하는 가장 큰 이유는 오버피팅을 방지하기 위함입니다.
+
+[RNN을 활용한 챗봇 시스템 구축]
+문장 혹은 문단 등 텍스트 데이터를 명사 혹은 띄어쓰기로 혹은 명사와 조사 등등
+설정을 통해 분류를 하여 토큰화 시킵니다. .,""과같은 불필요 요소 제거작업과
+비슷한 의미지만 다르게 쓰이고있는 예를들어 machine-learning, machin_learning,
+ ml, machinLearning 등을 정규식을 활용해 정제합니다. 후에 아버지가 아버지께서와 
+같은 어간을 추출하여 단어의 기본 형태로 만들어 줍니다. 또한 불필요한 전치사,
+관사와 같은 불용어들을 제거해 줍니다. 마지막으로 코드로 원핫 인코딩을 하여 dtm을
+만들어 단어 분리과정을 실행합니다.
+
+# R 코드
+library(tm)
+my.text.location <- "c:/JMOh/refer_data/ymbaek_papers"
+mypaper <- VCorpus(DirSource(my.text.location))
+mypaper
+#meta():메타데이터 구성
+summary(mypaper)
+mypaper[[2]] #두번째 문서
+mypaper[[2]]$content
+mypaper[[2]]$meta
+#meta:mypaper[[2]]를 설명하는 데이터
+meta(mypaper[[2]], tag ='author')<-'g.d.hong'
+mypaper[[2]]
+mypaper[[2]]$meta
+
+#tm_map(코퍼스, 사전처리함수)
+library(stringr)
+myfunc<-function(x){
+  #특수기호(-, /,...) 전후의 단어를 확인
+  mypuncts<-
+    str_extract_all(x,"[[:alnum:]]{1,}[[:punct:]]{1}[[:alnum:]]{1,}")
+}
+mypuncts<-lapply(mypaper,myfunc)
+table(unlist(mypuncts))
+
+myfunc<-function(x){
+  #수치 자료 추출
+  mydigits<-str_extract_all(x,"[[:digit:]]{1,}")
+}
+mydigits<-lapply(mypaper,myfunc)
+table(unlist(mydigits))
+
+#고유명사 추출(대문자로 시작)
+myfunc<-function(x){
+  #수치 자료 추출
+  myuppers<-str_extract_all(x,"[[:upper:]]{1}[[:alpha:]]{1,}")
+}
+myuppers<-lapply(mypaper,myfunc)
+table(unlist(myuppers))
+
+mypaper[[2]]$content
+#추가
+mycorpus<-tm_map(mypaper,removeNumbers)
+mytempfunc<-function(myobject,oldexp,newexp){
+  newobject<-tm_map(myobject, 
+                    content_transformer(
+                      function(x,pattern) gsub(pattern, newexp, 
+                                               x)),oldexp)
+  #x:myobject, pattern:-collar, newexp:collar
+  newobject
+}
+mycorpus<-mytempfunc(mypaper,"-collar","collar")
+mycorpus<-mytempfunc(mypaper,"e\\.g\\.","for example")
+mycorpus<-mytempfunc(mypaper,"and/or","and or")
+
+mycorpus<-tm_map(mycorpus,removePunctuation)
+mycorpus<-tm_map(mycorpus,stripWhitespace)
+mycorpus<-tm_map(mycorpus,
+                 content_transformer(tolower))
+mycorpus<-tm_map(mycorpus,removeWords, 
+                 words=stopwords("SMART"))
+mycorpus<-tm_map(mycorpus,
+                 stemDocument, language='en')
+#어근 동일화
+
+#문자 개수 계산 함수
+mycharfunc<-function(x){
+  str_extract_all(x, ".")
+}
+#단어수 계산 함수
+mywordfunc<-function(x){
+  str_extract_all(x, boundary("word"))
+}
+mychar<-lapply(mypaper, mycharfunc)
+myuniquechar0<-length(table(unlist(mychar))) #79문자 사용
+mytotalchar0<-sum(table(unlist(mychar)))#24765글자
+myword<-lapply(mypaper,mywordfunc)
+myuniqueword0<-length(table(unlist(myword))) #1151 개 종류 단어
+mytotalword0<-sum(table(unlist(myword))) #총 3504 개 단어 사용
+#전처리 이후
+mychar<-lapply(mycorpus, mycharfunc)
+myuniquechar1<-length(table(unlist(mychar))) #79문자 사용
+mytotalchar1<-sum(table(unlist(mychar)))#24765글자
+myword<-lapply(mycorpus,mywordfunc)
+myuniqueword1<-length(table(unlist(myword))) #1151 개 종류 단어
+mytotalword1<-sum(table(unlist(myword))) #총 3504 개 단어 사용
+
+results.comparing<-rbind(
+  c(myuniquechar0, myuniquechar1),
+  #전처리 전 글자 종류:79, 전처리 후 : 41
+  c(mytotalchar0, mytotalchar1),
+  c(myuniqueword0, myuniqueword1),
+  #1151, 710
+  c(mytotalword0, mytotalword1))
+
+#3504, 2060
+results.comparing
+colnames(results.comparing)<-c("before","after")
+rownames(results.comparing)<-c("고유문자수","총문자수",
+                               "고유단어수","총단어수")
+results.comparing
+
+#문서*단어 행렬 구성
+dtm.e<-DocumentTermMatrix(mycorpus)
+dtm.e
+
+#가로줄 이름(문서 이름)
+rownames(dtm.e[,])
+#단어
+colnames(dtm.e[,])
+#행렬의 내용 참조
+inspect(dtm.e[1:3,50:55])
